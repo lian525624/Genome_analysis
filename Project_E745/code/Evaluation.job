@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 00:30:00
+#SBATCH -J busco_evaluation
+#SBATCH --mail-type=ALL
+#SBATCH --output=./log/%x.%j.out
+#SBATCH --error=./log/%x.%j.err
+#module load QUAST/5.2.0-foss-2024a-Python-2.7.18
+#quast.py -o ../analysis/03_evaluation/Quast_evaluation ../analysis/02_assembly/Hybrid_Assembly/contigs.fasta ../analysis/02_assembly/PacBio_assembly/Pacbio_E745.contigs.fasta
+module load BUSCO/5.8.2-gfbf-2024a
+busco -i ../analysis/02_assembly/Hybrid_Assembly/contigs.fasta -m genome --auto-lineage -c 2 -o ../analysis/03_evaluation/Hybrid_Busco
+busco -i ../analysis/02_assembly/PacBio_assembly/Pacbio_E745.contigs.fasta -m genome --auto-lineage -c 2 -o ../analysis/03_evaluation/Pacbio_Busco
+
