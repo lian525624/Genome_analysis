@@ -1,0 +1,12 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 00:30:00
+#SBATCH -J mummer
+#SBATCH --mail-type=ALL
+#SBATCH --output=./log/%x.%j.out
+module load MUMmer
+module load gnuplot
+nucmer -p ../analysis/04_synteny/E745_vs_DO ../data/reference_genome/GCF_000174395.2_DO_Refgenome.fna ../analysis/04_synteny/Pacbio_E745.contigs.fasta
+mummerplot -png --filter --layout -p E745_vs_DO ../analysis/04_synteny/E745_vs_DO.delta 
