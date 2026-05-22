@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 01:00:00
+#SBATCH -J RNA_qc
+#SBATCH --mail-type=ALL
+#SBATCH --output=./log/%x.%j.out
+#SBATCH --error=./log/%x.%j.err
+module load FastQC
+#fastqc -o ../analysis/01_QC/after_trimmed ../data/trimmed_data/Illumina*
+fastqc -o ../analysis/01_QC/after_trimmed/RNA-Seq_Serum ../data/trimmed_data/RNA-Seq_Serum/*paired*
+fastqc -o ../analysis/01_QC/after_trimmed/RNA-Seq_BH ../data/trimmed_data/RNA-Seq_BH/*paired*
+#fastqc -o ../analysis/01_QC/ref_trimmed/RNA-Seq_Serum ../data/1_Zhang_2017/transcriptomics_data/RNA-Seq_Serum/trimmed/*paired*
+#fastqc -o ../analysis/01_QC/ref_trimmed/RNA-Seq_BH ../data/1_Zhang_2017/transcriptomics_data/RNA-Seq_BH/trimmed/*paired* 
