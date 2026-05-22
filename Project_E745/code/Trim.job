@@ -1,0 +1,46 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 01:00:00
+#SBATCH -J trim
+#SBATCH --mail-type=ALL
+#SBATCH --output=%x.%j.out
+module load Trimmomatic/0.39-Java-17
+TRIMJAR=/sw/arch/eb/software/Trimmomatic/0.39-Java-17/trimmomatic-0.39.jar 
+
+#trim Illumina
+trimmomatic PE -phred33 \
+../data/raw_data/Illumina_1.fq.gz ../data/raw_data/Illumina_2.fq.gz \
+../data/trimmed_data/Illumina_1_paired.fq.gz ../data/trimmed_data/Illumina_1_single.fq.gz \
+../data/trimmed_data/Illumina_2_paired.fq.gz ../data/trimmed_data/Illumina_2_single.fq.gz \
+HEADCROP:15 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+trim RNA_Serum
+for r1 in ../data/raw_data/RNA-Seq_Serum/*_1.fastq.gz
+do
+base=$(basename "$r1" _1.fastq.gz)
+r2="../data/raw_data/RNA-Seq_Serum/${base}_2.fastq.gz"
+echo "Processing $base ..."
+#trim RNA_Serum
+java -jar $TRIMJAR PE -phred33 \
+"$r1" "$r2" \
+"../data/trimmed_data/RNA-Seq_Serum/${base}_1_paired.fastq.gz" "../data/trimmed_data/RNA-Seq_Serum/${base}_1_single.fastq.gz" \
+"../data/trimmed_data/RNA-Seq_Serum/${base}_2_paired.fastq.gz" "../data/trimmed_data/RNA-Seq_Serum/${base}_2_single.fastq.gz" \
+ILLUMINACLIP:/sw/generic/pixi-envs/shovill-1.4.2/.pixi/envs/default/share/trimmomatic-0.40-0/adapters/TruSeq3-PE.fa:2:30:10 \
+LEADING:15 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+done
+#trim RNA_BH
+for r1 in ../data/raw_data/RNA-Seq_BH/raw/*_1.fastq.gz
+do
+base=$(basename "$r1" _1.fastq.gz)
+r2="../data/raw_data/RNA-Seq_BH/raw/${base}_2.fastq.gz"
+echo "Processing $base ..."
+
+java -jar $TRIMJAR PE -phred33 \
+"$r1" "$r2" \
+"../data/trimmed_data/RNA-Seq_BH/${base}_1_paired.fastq.gz" "../data/trimmed_data/RNA-Seq_BH/${base}_1_single.fastq.gz" \
+"../data/trimmed_data/RNA-Seq_BH/${base}_2_paired.fastq.gz" "../data/trimmed_data/RNA-Seq_BH/${base}_2_single.fastq.gz" \
+ILLUMINACLIP:/sw/generic/pixi-envs/shovill-1.4.2/.pixi/envs/default/share/trimmomatic-0.40-0/adapters/TruSeq3-PE.fa:2:30:10 \
+LEADING:15 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+done
+
