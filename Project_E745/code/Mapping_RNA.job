@@ -1,0 +1,39 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 03:30:00
+#SBATCH -J bwa_RNA
+#SBATCH --output=./log/%x.%j.out
+module load BWA
+module load SAMtools
+# index reference genome
+bwa index ../analysis/05_mapping_RNA/index/Pacbio_E745.contigs.fasta
+samtools faidx ../analysis/05_mapping_RNA/index/Pacbio_E745.contigs.fasta
+# mapping
+for trim in ../data/trimmed_data/RNA-Seq_*/*paired*
+do
+base=$(basename "$trim" .fastq.gz)
+bwa aln ../analysis/05_mapping_RNA/index/Pacbio_E745.contigs.fasta $trim \
+> ../analysis/05_mapping_RNA/$base.sai
+done
+# convert sai files into sam files and remove all the sai
+for sai1 in ../analysis/05_mapping_RNA/*1_paired.sai
+do
+base=$(basename "$sai1" _1_paired.sai)
+bwa sampe ../analysis/05_mapping_RNA/index/Pacbio_E745.contigs.fasta \
+$sai1 ../analysis/05_mapping_RNA/"$base"_2_paired.sai \
+../data/trimmed_data/RNA-Seq_*/"$base"_1_paired.fastq.gz ../data/trimmed_data/RNA-Seq_*/"$base"_2_paired.fastq.gz \
+> ../analysis/05_mapping_RNA/"$base"_bwa.sam
+# convert into bam file
+samtools view -b ../analysis/05_mapping_RNA/"$base"_bwa.sam \
+-o ../analysis/05_mapping_RNA/"$base"_bwa.bam
+rm -rf ../analysis/05_mapping_RNA/"$base"_bwa.sam
+# sort and index bam file
+samtools sort -o ../analysis/05_mapping_RNA/"$base"_bwa.sorted.bam \
+../analysis/05_mapping_RNA/"$base"_bwa.bam
+samtools index ../analysis/05_mapping_RNA/"$base"_bwa.sorted.bam
+done
+rm -rf ../analysis/05_mapping_RNA/*.sai
+
+
