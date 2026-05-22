@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 06:00:00
+#SBATCH -J assembly_pacbio
+#SBATCH --mail-type=ALL
+#SBATCH --output=./log/%x.%j.out
+#SBATCH --error=./log/%x.%j.err
+module load canu/2.3-GCCcore-13.3.0-Java-17
+module load SAMtools
+canu \
+ -p Pacbio_E745 -d ../analysis/02_assembly/ \
+ genomeSize=3.2m \
+ useGrid=false \
+ maxThreads=2 \
+ maxMemory=10 \
+ corThreads=2 \
+ -pacbio ../data/raw_data/PacBio*
