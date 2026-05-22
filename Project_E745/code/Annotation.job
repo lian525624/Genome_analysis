@@ -1,0 +1,22 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 13:30:00
+#SBATCH -J prokka_emapper
+#SBATCH --output=./log/%x.%j.out
+module load eggnog-mapper
+#module load prokka
+# structural annotation
+#prokka ../analysis/06_annotation/Pacbio_E745.contigs.fasta \
+#--prefix E745_prokka --outdir ../analysis/06_annotation/structure \
+#--genus Enterococcus --species faecium --strain E745
+
+# functional annotation
+emapper.py --itype proteins \
+--data_dir /home/lian6/Genome_analysis/Project_E745/database/eggnog-mapper/rackham \
+-i ../analysis/06_annotation/structure/E745_prokka.faa \
+-o E745_emapper --output_dir ../analysis/06_annotation/function \
+--decorate_gff ../analysis/06_annotation/structure/E745_prokka.gff \
+--decorate_gff_ID_field ID
+
