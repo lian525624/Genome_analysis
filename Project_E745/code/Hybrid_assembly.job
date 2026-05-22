@@ -1,0 +1,11 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 03:00:00
+#SBATCH -J hybrid_assembly
+#SBATCH --mail-type=ALL
+#SBATCH --output=./log/%x.%j.out
+#SBATCH --error=./log/%x.%j.err
+module load SPAdes
+spades.py -1 ../data/raw_data/Illumina_1.fq.gz -2 ../data/raw_data/Illumina_2.fq.gz --nanopore ../data/raw_data/Nanopore.fasta.gz -o ../analysis/02_assembly/Hybrid_Assembly
