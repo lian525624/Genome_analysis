@@ -1,0 +1,17 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2026-1-61
+#SBATCH -p pelle
+#SBATCH -c 2
+#SBATCH -t 07:05:00
+#SBATCH -J count_reads
+#SBATCH --output=./log/%x.%j.out
+module load HTSeq
+for bam in ../analysis/05_mapping_RNA/*bam
+do
+base=$(basename "$bam" _bwa.sorted.bam)
+htseq-count -f bam --order pos -s no -t CDS -i ID \
+        --additional-attr=gene \
+        $bam ../analysis/06_annotation/function/E745_emapper.emapper.decorated.gff \
+	> ../analysis/07_counts/strand_no/"$base".counts.txt
+done
+
